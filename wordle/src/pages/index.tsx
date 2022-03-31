@@ -1,38 +1,16 @@
-import { BoardContainer } from '@features/wordle/components/BoardContainer'
 import { LineContainer } from '@features/wordle/components/LineContainer'
-import { Box, Line } from '@features/wordle/types'
-import produce from 'immer'
+import { useLines } from '@features/wordle/lines.slice'
+import { nextPosition, previousPosition } from '@features/wordle/position.slice'
+import { Line } from '@features/wordle/types'
+import { useAppDispatch } from '@redux/hooks'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
-  const baseBox: Box = {
-    position: 1,
-    letter: '',
-    filled: false,
-    fullMatch: false,
-    match: false,
-  }
 
-  const baseLine: Line = {
-    position: 1,
-    boxes: [1,2,3.4,5].map((i) => ({ ...baseBox, position: i })),
-  }
-
-  const lines: Line[] = [1,2,3,4,5].map((i) =>
-    produce(baseLine, (draftLine) => (void(draftLine.position = i)))
-  )
-
-  console.log(lines)
-
-  // const lines = [
-  //   [1, 2, 3, 4, 5],
-  //   [1, 2, 3, 4, 5],
-  //   [1, 2, 3, 4, 5],
-  //   [1, 2, 3, 4, 5],
-  //   [1, 2, 3, 4, 5],
-  // ]
+  const lines:Line[] = useLines()
+  const dispatcher = useAppDispatch()
 
   return (
     <div className={styles.container}>
@@ -43,11 +21,22 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={`${styles.title} pb-4`}>Wordle 4 Kids</h1>
+        {/* <h1 className={`${styles.title} pb-4`}>Wordle 4 Kids</h1> */}
+        <h1 className={`${styles.title} pb-4`}>----</h1>
+        <div className='inline-flex mb-4'>
+          <button className='bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l'
+                  onClick={()=>dispatcher(previousPosition())}
+          >
+            Prev
+          </button>
+          <button className='bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r'
+                  onClick={()=>dispatcher(nextPosition())}
+          >
+            Next
+          </button>
+        </div>
         <div className='grid grid-cols-5 grid-flow-row gap-4'>
-          <BoardContainer>
-            <LineContainer lines={lines}></LineContainer>
-          </BoardContainer>
+          <LineContainer lines={lines}></LineContainer>
         </div>
       </main>
     </div>

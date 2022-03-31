@@ -1,3 +1,4 @@
+import { useAppSelector } from '@redux/hooks'
 import { RootState } from '@redux/store'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { Position } from './types'
@@ -13,38 +14,38 @@ const initialState = {
 
 const slice = createSlice({
   name: 'position',
-  initialState: initialState,
+  initialState,
   reducers: {
-    nextPosition: (
-      state,
-    ) => {
+    nextPosition: (state) => {
       const { position } = state
-      if(position.boxIdx < 5) {
-        state.position.boxIdx++
+      if (position.boxIdx < 5) {
+        position.boxIdx += 1
       } else {
-        state.position.lineIdx < 5 && state.position.lineIdx++
-        state.position.boxIdx = 1
+        position.lineIdx =
+          position.lineIdx < 5 ? position.lineIdx + 1 : position.lineIdx
+        position.boxIdx = 1
       }
+
+      const boxId = `box-${position.lineIdx}-${position.boxIdx}`
+      document.getElementById(boxId)?.focus()
     },
-    previousPosition: (
-      state,
-    ) => {
+    previousPosition: (state) => {
       const { position } = state
-      if(position.boxIdx > 1) {
-        state.position.boxIdx--
+      if (position.boxIdx > 1) {
+        state.position.boxIdx -= 1
       } else {
         state.position.lineIdx > 1 && state.position.lineIdx--
         state.position.boxIdx = 5
       }
-    }
-
+    },
   },
 })
 
 const { actions, reducer } = slice
 
-export const selectPosition = (state: RootState) => 
-  state.position
+const selectPosition = (state: RootState) => state.position.position
+
+export const usePosition = () => useAppSelector(selectPosition)
 
 export const { nextPosition, previousPosition } = actions
 export default reducer
